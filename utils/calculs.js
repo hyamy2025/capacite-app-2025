@@ -1,36 +1,34 @@
-export const surfaceMaximale = (superficie, cno) => {
-  const s = parseFloat(superficie || 0);
+export function calculerSurfacePedagogique(surface, cno) {
+  const s = parseFloat(surface || 0);
   const c = parseFloat(cno || 1);
-  return s * c;
-};
+  if (c === 0) return 0;
+  const resultat = s / c;
+  return resultat <= 26 ? resultat : 26;
+}
 
-export const heuresDisponibles = (semaines) => {
-  const s = parseInt(semaines || 0);
-  return 56 * s;
-};
+export function calculerHeuresDisponibles(semaines) {
+  return 56 * parseFloat(semaines || 0);
+}
 
-export const moyenne = (valeurs) => {
-  if (!valeurs.length) return 0;
-  const total = valeurs.reduce((acc, val) => acc + parseFloat(val || 0), 0);
-  return total / valeurs.length;
-};
+export function calculerMoyenneColonne(valeurs) {
+  const valides = valeurs.map((v) => parseFloat(v || 0));
+  const total = valides.reduce((a, b) => a + b, 0);
+  return valides.length ? (total / valides.length).toFixed(2) : "0.00";
+}
 
-export const somme = (valeurs) => {
-  return valeurs.reduce((acc, val) => acc + parseFloat(val || 0), 0);
-};
+export function calculerSommeColonne(valeurs) {
+  return valeurs
+    .map((v) => parseFloat(v || 0))
+    .reduce((a, b) => a + b, 0)
+    .toFixed(2);
+}
 
-export const verdict = (valeur) => {
-  const v = parseFloat(valeur || 0);
-  return v >= 0 ? 'Excédent' : 'Dépassement';
-};
-
-export const couleur = (valeur) => {
-  const v = parseFloat(valeur || 0);
-  return v >= 0 ? 'text-green-700' : 'text-red-700';
-};
-
-export const calculTotalApprenantsAjoutes = (groupesAjoutes, capaciteMoyenne) => {
-  const g = parseInt(groupesAjoutes || 0);
-  const c = parseFloat(capaciteMoyenne || 0);
-  return g * c;
-};
+export function analyserResultat(heuresDisponibles, heuresBesoins, surfaceMoyenne, totalSalles) {
+  const reste = heuresDisponibles - heuresBesoins;
+  const apprenants =
+    heuresBesoins > 0 && surfaceMoyenne > 0
+      ? ((reste / heuresBesoins) * totalSalles * surfaceMoyenne).toFixed(0)
+      : 0;
+  const statut = reste >= 0 ? "Excédent" : "Dépassement";
+  return { reste: reste.toFixed(2), apprenants, statut };
+}

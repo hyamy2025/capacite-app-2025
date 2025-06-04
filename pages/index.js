@@ -1,25 +1,37 @@
-import Image from 'next/image';
-import BoutonNavigation from '../components/BoutonNavigation';
+import React from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import logo from "../public/logo-ministere.png";
 
-export default function Home() {
+export default function Accueil() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-      <div className="mb-6">
-        <Image src="/logo-ministere.png" alt="Logo Ministère" width={120} height={120} />
-      </div>
+    <>
+      <Head>
+        <title>Diagnostic de la Capacité d’Accueil</title>
+      </Head>
 
-      <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
-        Diagnostic de la Capacité d’Accueil
-      </h1>
+      <main className="min-h-screen flex flex-col justify-center items-center p-4 space-y-8">
+        <Image src={logo} alt="Logo Ministère" width={100} height={100} />
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          Diagnostic de la Capacité d’Accueil
+        </h1>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <BoutonNavigation href="/tda" label="Test de dépassement actuel" couleur="blue" />
-        <BoutonNavigation href="/tdp" label="Test de dépassement prévu" couleur="green" />
-      </div>
+        <div className="space-x-4">
+          <button className="add" onClick={() => router.push("/tda")}>
+            Test de dépassement actuel
+          </button>
+          <button className="add" onClick={() => router.push("/tdp")}>
+            Test de dépassement prévu
+          </button>
+        </div>
 
-      <p className="text-gray-600 mt-8">
-        Version : <strong>V1.0</strong>
-      </p>
-    </div>
+        <footer className="mt-8 text-sm text-gray-600">
+          Version : <strong>V1.0</strong>
+        </footer>
+      </main>
+    </>
   );
 }
