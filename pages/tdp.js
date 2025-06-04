@@ -1,81 +1,76 @@
 import React from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
 import TableauSalles from "../components/TableauSalles";
 import TableauEffectif from "../components/TableauEffectif";
 import TableauRepartition from "../components/TableauRepartition";
-import TableauResultat from "../components/TableauResultat";
-import { genererPDF } from "../utils/generatePDF";
+import TableauResultat from "../components/TableauResultats";
+import { genererPDF } from "../components/generatePDF";
 import useTableauxState from "../hooks/useTableauxState";
 
 export default function TDP() {
-  const router = useRouter();
-
   const {
-    sallesTh, setSallesTh,
-    sallesPr, setSallesPr,
-    effectif, setEffectif,
-    repartition, setRepartition,
-    historique, enregistrerEtat, annuler,
+    sallesTh,
+    setSallesTh,
+    sallesPr,
+    setSallesPr,
+    effectif,
+    setEffectif,
+    repartition,
+    setRepartition,
+    enregistrerEtat,
+    annuler,
     calculs,
   } = useTableauxState();
 
   return (
-    <>
-      <Head>
-        <title>Test de dépassement prévu</title>
-      </Head>
-      <main className="p-4 space-y-8">
-        <TableauSalles
-          titre="Salles Théoriques"
-          salles={sallesTh}
-          setSalles={setSallesTh}
-          enregistrerEtat={enregistrerEtat}
-        />
-        <TableauSalles
-          titre="Salles Pratiques"
-          salles={sallesPr}
-          setSalles={setSallesPr}
-          enregistrerEtat={enregistrerEtat}
-        />
-        <TableauEffectif
-          titre="Effectif Prévu"
-          effectif={effectif}
-          setEffectif={setEffectif}
-          ajouterLigne={() =>
-            setEffectif([
-              ...effectif,
-              { nom: "", session: "Mars 2023", groupes: "", apprenants: "" },
-            ])
-          }
-          enregistrerEtat={enregistrerEtat}
-        />
-        <TableauRepartition
-          titre="Répartition prévue des heures"
-          repartition={repartition}
-          setRepartition={setRepartition}
-          effectif={effectif}
-          enregistrerEtat={enregistrerEtat}
-        />
-        <TableauResultat
-          heuresDisponiblesTh={calculs.heuresTh}
-          heuresDisponiblesPr={calculs.heuresPr}
-          besoinsTh={calculs.besoinsTh}
-          besoinsPr={calculs.besoinsPr}
-          surfaceMoyenneTh={calculs.surfaceTh}
-          surfaceMoyennePr={calculs.surfacePr}
-          nbSallesTh={sallesTh.length}
-          nbSallesPr={sallesPr.length}
-        />
+    <div className="p-4 space-y-6">
+      <h1 className="text-2xl font-bold text-center text-blue-900">
+        Test de Dépassement Prévu
+      </h1>
 
-        <div className="flex justify-between mt-8">
-          <button className="nav" onClick={() => router.push("/")}>← Accueil</button>
-          <div className="space-x-2">
-            <button className="cancel" onClick={annuler}>Annuler</button>
-            <button className="add" onClick={genererPDF}>Télécharger PDF</button>
-          </div>
-        </div>
-      </main>
-    </>
+      <TableauSalles
+        type="théorique"
+        salles={sallesTh}
+        setSalles={setSallesTh}
+        enregistrerEtat={enregistrerEtat}
+        annuler={annuler}
+      />
+      <TableauSalles
+        type="pratique"
+        salles={sallesPr}
+        setSalles={setSallesPr}
+        enregistrerEtat={enregistrerEtat}
+        annuler={annuler}
+      />
+      <TableauEffectif
+        effectif={effectif}
+        setEffectif={setEffectif}
+        enregistrerEtat={enregistrerEtat}
+        annuler={annuler}
+        isPrevu
+      />
+      <TableauRepartition
+        effectif={effectif}
+        repartition={repartition}
+        setRepartition={setRepartition}
+        enregistrerEtat={enregistrerEtat}
+        annuler={annuler}
+      />
+      <TableauResultat {...calculs} />
+
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={genererPDF}
+          className="bg-green-600 text-white py-2 px-4 rounded shadow"
+        >
+          Télécharger en PDF
+        </button>
+        <a
+          href="/"
+          className="bg-gray-600 text-white py-2 px-4 rounded shadow"
+        >
+          Retour à l'accueil
+        </a>
+      </div>
+    </div>
   );
 }
