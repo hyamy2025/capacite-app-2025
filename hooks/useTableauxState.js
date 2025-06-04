@@ -1,45 +1,69 @@
-import { useState } from "react";
-import { calculerStats } from "../utils/calculs";
+import { useState, useEffect } from "react";
+import { calculSurfacePedagogique, calculerNombreHeures, calculerStats } from "../utils/calculs";
 
-export default function useTableauxState() {
-  const [sallesTh, setSallesTh] = useState([]);
-  const [sallesPr, setSallesPr] = useState([]);
-  const [effectif, setEffectif] = useState([]);
-  const [repartition, setRepartition] = useState([]);
-  const [historique, setHistorique] = useState([]);
+const defaultSemaines = 40;
+const defaultCNO = 1.4;
 
-  const enregistrerEtat = () => {
-    setHistorique((h) => [
-      ...h,
-      { sallesTh, sallesPr, effectif, repartition },
-    ]);
-  };
+export function useTableauxState(initialState) {
+  const [tableaux, setTableaux] = useState(() => {
+    const saved = localStorage.getItem("capacite-data");
+    return saved ? JSON.parse(saved) : initialState;
+  });
 
-  const annuler = () => {
-    const dernier = historique[historique.length - 1];
-    if (dernier) {
-      setSallesTh(dernier.sallesTh);
-      setSallesPr(dernier.sallesPr);
-      setEffectif(dernier.effectif);
-      setRepartition(dernier.repartition);
-      setHistorique(historique.slice(0, -1));
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    localStorage.setItem("capacite-data", JSON.stringify(tableaux));
+  }, [tableaux]);
+
+  const undo = () => {
+    if (history.length > 0) {
+      const last = history[history.length - 1];
+      setTableaux(last);
+      setHistory((prev) => prev.slice(0, -1));
     }
   };
 
-  const calculs = calculerStats(sallesTh, sallesPr, effectif, repartition);
+  const update = (newData) => {
+    setHistory((prev) => [...prev, tableaux]);
+    setTableaux(newData);
+  };
+
+  const updateSalles = (type, data) => {
+    const updated = data.map((salle) => {
+      const surface = parseFloat(salle.surface) || 0;
+      const cno = parseFloat(salle.cno) || defaultCNO;
+      const semaines = parseInt(salle.semaines || defaultSemaines);
+      const surfacePedagogique = calculSurfacePedagogique(surface, cno);
+      const heures = calculerNombreHeures(semaines);
+      return {
+        ...salle,
+        surface,
+        cno,
+        surfacePedagogique,
+        semaines,
+        heures,
+      };
+    });
+    update({ ...tableaux, [type]: updated });
+  };
+
+  const updateAutres = (key, data) => {
+    update({ ...tableaux, [key]: data });
+  };
+
+  const resultats = calculerStats(
+    tableaux.sallesTheoriques,
+    tableaux.sallesPratiques,
+    tableaux.effectif,
+    tableaux.repartition
+  );
 
   return {
-    sallesTh,
-    setSallesTh,
-    sallesPr,
-    setSallesPr,
-    effectif,
-    setEffectif,
-    repartition,
-    setRepartition,
-    historique,
-    enregistrerEtat,
-    annuler,
-    calculs,
+    tableaux,
+    updateSalles,
+    updateAutres,
+    undo,
+    resultats,
   };
 }
