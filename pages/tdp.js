@@ -1,12 +1,12 @@
 import React from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import TableauSalles from "../components/TableauSalles";
 import TableauEffectif from "../components/TableauEffectif";
 import TableauRepartition from "../components/TableauRepartition";
 import TableauResultat from "../components/TableauResultat";
-import useTableauxState from "../hooks/useTableauxState";
 import { genererPDF } from "../utils/generatePDF";
-import { useRouter } from "next/router";
+import useTableauxState from "../hooks/useTableauxState";
 
 export default function TDP() {
   const router = useRouter();
@@ -25,7 +25,6 @@ export default function TDP() {
       <Head>
         <title>Test de dépassement prévu</title>
       </Head>
-
       <main className="p-4 space-y-8">
         <TableauSalles
           titre="Salles Théoriques"
@@ -33,25 +32,24 @@ export default function TDP() {
           setSalles={setSallesTh}
           enregistrerEtat={enregistrerEtat}
         />
-
         <TableauSalles
           titre="Salles Pratiques"
           salles={sallesPr}
           setSalles={setSallesPr}
           enregistrerEtat={enregistrerEtat}
         />
-
         <TableauEffectif
           titre="Effectif Prévu"
           effectif={effectif}
           setEffectif={setEffectif}
-          ajouterLigne={() => {
-            enregistrerEtat();
-            setEffectif([...effectif, { nom: "", session: "Mars 2023", groupes: "", apprenants: "" }]);
-          }}
+          ajouterLigne={() =>
+            setEffectif([
+              ...effectif,
+              { nom: "", session: "Mars 2023", groupes: "", apprenants: "" },
+            ])
+          }
           enregistrerEtat={enregistrerEtat}
         />
-
         <TableauRepartition
           titre="Répartition prévue des heures"
           repartition={repartition}
@@ -59,7 +57,6 @@ export default function TDP() {
           effectif={effectif}
           enregistrerEtat={enregistrerEtat}
         />
-
         <TableauResultat
           heuresDisponiblesTh={calculs.heuresTh}
           heuresDisponiblesPr={calculs.heuresPr}
